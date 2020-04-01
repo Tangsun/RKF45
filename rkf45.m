@@ -1,4 +1,4 @@
-function [T, X, err] = rkf45(sys, tspan, x0, tol)
+function [T, X, err] = rkf45(sys, tspan, x0, abstol, reltol)
     global a b c
     c = [0, 1/4, 3/8, 12/13, 1, 1/2];
     a = zeros(6, 5);
@@ -11,7 +11,7 @@ function [T, X, err] = rkf45(sys, tspan, x0, tol)
         25/216, 0, 1408/2565, 2197/4104, -1/5, 0];
     
     if nargin == 3
-        tol = 1e-6;
+        abstol = 1e-6;
     elseif nargin < 3
         printf('Not enough arguments');
     end
@@ -23,8 +23,14 @@ function [T, X, err] = rkf45(sys, tspan, x0, tol)
     x = X(:, 1); t = T(1);
     h = h0; err = [];
     while(~terminate)
+        reltol_pass = 0;
         [x_rk5, e] = err_rk45(sys, h, t, x);
-        if e <= tol
+        if e < reltol*abs(x_rk5)
+            reltol_pass = 1;
+        elseif min(x_rk5) == 0
+            reltol_pass = 1;
+        end
+        if max(e) <= abstol && reltol_pass == 1
             t = t + h;
             x = x_rk5;
             X = [X, x];
@@ -32,7 +38,7 @@ function [T, X, err] = rkf45(sys, tspan, x0, tol)
             err = [err; e];
             h = 0.5;
         else
-            s = (tol/(2*max(e)))^0.25;
+            s = (abstol/(2*max(e)))^0.25;
             h = s*h;
             if h < hmin
                 h = hmin;

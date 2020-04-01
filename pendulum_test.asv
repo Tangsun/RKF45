@@ -37,5 +37,5 @@ plot(sol_T2, sol_X2(:, 2), 'bx--', 'LineWidth', 1);
 legend('d\thetadt, rkf45', 'd\thetadt, ode45');
 xlabel('Time [sec]');
 ylabel('x(t)');
-str_file2 = sprintf('pendulum2_x0_%f_%f(rel_%d_abs_%d)', x0(1), x0(2), -log10(reltol), -log10(abstol));
+str_file1 = sprintf('pendulum2_x0_%f_%f(rel_%d_abs_%d)', x0(1), x0(2), -log10(reltol), -log10(abstol));
 saveas(1, str_file2, 'epsc');
